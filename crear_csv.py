@@ -2,19 +2,82 @@ import streamlit as st
 import pandas as pd
 import re
 
-st.title("Conversor Excel → CSV CAASA")
-st.write("Convierte tu Excel al formato: correo,correo,,,PIN")
+# ---- ESTILO MODERNO ----
+st.markdown("""
+<style>
+
+html, body, [class*="css"]  {
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.card {
+    background: rgba(255,255,255,0.06);
+    padding: 25px 35px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.12);
+    margin-top: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 3rem !important;
+    font-weight: 700 !important;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 1.2rem !important;
+    color: #cfcfcf;
+    margin-top: -10px;
+}
+
+.stButton>button {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    border-radius: 10px;
+    padding: 10px 22px;
+    border: none;
+    font-size: 1rem;
+    transition: 0.2s ease;
+}
+
+.stButton>button:hover {
+    background: linear-gradient(135deg, #6366f1, #9333ea);
+    transform: scale(1.03);
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---- UI ----
+st.markdown("<h1>Conversor Excel → CSV CAASA</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Convierte tu Excel al formato empresarial: correo,correo,,,PIN</p>", unsafe_allow_html=True)
+
+st.markdown("<div class='container'>", unsafe_allow_html=True)
+st.markdown("<div class='card'>", unsafe_allow_html=True)
 
 archivo = st.file_uploader("📤 Cargar archivo Excel", type=["xlsx", "xls"])
 
-# --- Función para detectar correos ---
+# --- Detectar correo ---
 def detectar_columna_correo(df):
     for col in df.columns:
         if df[col].astype(str).str.contains("@", na=False).any():
             return col
     return None
 
-# --- Función para detectar el PIN ---
+# --- Detectar PIN ---
 def detectar_columna_pin(df):
     for col in df.columns:
         if df[col].astype(str).str.match(r"^\d{6,12}$", na=False).any():
@@ -26,7 +89,6 @@ if archivo:
 
         df = pd.read_excel(archivo)
 
-        # Detectar columnas
         col_correo = detectar_columna_correo(df)
         col_pin = detectar_columna_pin(df)
 
@@ -38,16 +100,11 @@ if archivo:
             st.error("❌ No se encontró ninguna columna con PIN numérico.")
             st.stop()
 
-        # Extraer datos (saltamos la fila 0 si es encabezado)
-        correos = df[col_correo].dropna().astype(str)
-        pines = df[col_pin].dropna().astype(str)
+        correos = df[col_correo].dropna().astype(str).reset_index(drop=True)
+        pines = df[col_pin].dropna().astype(str).reset_index(drop=True)
 
-        # Igualar longitud (si difiere)
         max_len = max(len(correos), len(pines))
-        correos = correos.reset_index(drop=True)
-        pines = pines.reset_index(drop=True)
 
-        # Construir el CSV final EXACTO
         df_final = pd.DataFrame({
             "A": correos,
             "B": correos,
@@ -57,10 +114,12 @@ if archivo:
             "F": pines
         })
 
-        st.write("### 📄 Vista previa del CSV final")
-        st.dataframe(df_final)
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-        # Exportar CSV sin encabezados
+        st.subheader("📄 Vista previa del CSV final")
+        st.dataframe(df_final, use_container_width=True)
+
         csv_bytes = df_final.to_csv(index=False, header=False).encode("utf-8")
 
         st.download_button(
@@ -69,3 +128,5 @@ if archivo:
             "formato_caasa.csv",
             "text/csv"
         )
+
+st.markdown("</div></div>", unsafe_allow_html=True)
