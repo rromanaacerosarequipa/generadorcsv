@@ -62,8 +62,8 @@ h1 {
 """, unsafe_allow_html=True)
 
 # ---- UI ----
-st.markdown("<h1>Conversor Excel → CSV CAASA</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Convierte tu Excel al formato empresarial: correo,correo,,,PIN</p>", unsafe_allow_html=True)
+st.markdown("<h1>Conversor Excel | CSV</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Convertir Excel | Correo,Correo,,,PIN</p>", unsafe_allow_html=True)
 
 st.markdown("<div class='container'>", unsafe_allow_html=True)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
