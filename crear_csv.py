@@ -3,40 +3,41 @@ import pandas as pd
 
 st.title("Conversor Excel → CSV CAASA")
 
-st.write("Sube tu archivo Excel con columnas A = correo y F = PIN.")
+st.write("Convierte tu Excel al formato: correo,correo,,,PIN")
 
 archivo = st.file_uploader("📤 Cargar archivo Excel", type=["xlsx", "xls"])
 
 if archivo:
     if st.button("Procesar Archivo"):
-        # Leer Excel
-        df = pd.read_excel(archivo, header=None)
+        # Leer Excel con encabezados
+        df = pd.read_excel(archivo)
 
-        # Columna A = correo
-        correo = df.iloc[:, 0]
+        # Saltar encabezados (fila 0), tomar desde fila 1 hacia abajo
+        correo = df.iloc[1:, 0]   # Columna A
+        pin = df.iloc[1:, 5]      # Columna F
 
-        # Columna F = PIN
-        pin = df.iloc[:, 5]
-
-        # Crear formato final CSV
+        # Construir formato final EXACTO
         df_final = pd.DataFrame({
             "correo": correo,
             "usuario": correo,
             "vacio1": "",
             "vacio2": "",
+            "vacio3": "",
             "PIN": pin
         })
 
-        st.write("### 📄 Vista previa del resultado:")
+        # Eliminar filas totalmente vacías (opcional)
+        df_final = df_final.dropna(subset=["correo", "PIN"])
+
+        st.write("### 📄 Vista previa del CSV final")
         st.dataframe(df_final)
 
-        # Convertir a CSV
+        # Exportar a CSV sin encabezados
         csv_bytes = df_final.to_csv(index=False, header=False).encode("utf-8")
 
-        # Descargar
         st.download_button(
             "📥 Descargar CSV Final",
-            data=csv_bytes,
-            file_name="formato_caasa.csv",
-            mime="text/csv"
+            csv_bytes,
+            "formato_caasa.csv",
+            "text/csv"
         )
