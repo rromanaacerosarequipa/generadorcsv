@@ -68,7 +68,7 @@ st.markdown("<p class='subtitle'>Convierte tu Excel al formato empresarial: corr
 st.markdown("<div class='container'>", unsafe_allow_html=True)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-archivo = st.file_uploader("📤 Cargar archivo Excel", type=["xlsx", "xls"])
+archivo = st.file_uploader("Cargar Excel", type=["xlsx", "xls"])
 
 # --- Detectar correo ---
 def detectar_columna_correo(df):
@@ -117,13 +117,13 @@ if archivo:
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-        st.subheader("📄 Vista previa del CSV final")
+        st.subheader("Vista Previa")
         st.dataframe(df_final, use_container_width=True)
 
         csv_bytes = df_final.to_csv(index=False, header=False).encode("utf-8")
 
         st.download_button(
-            "📥 Descargar CSV Final",
+            "Descargar CSV",
             csv_bytes,
             "formato_caasa.csv",
             "text/csv"
