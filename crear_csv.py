@@ -1,45 +1,42 @@
 import streamlit as st
 import pandas as pd
 
-st.title("🟦 Generador CSV CAASA")
+st.title("Conversor Excel → CSV CAASA")
 
-st.write("Sube un archivo CSV con columnas **correo** y **PIN** y genera el formato final.")
+st.write("Sube tu archivo Excel con columnas A = correo y F = PIN.")
 
-# ----------------------------
-# 1) BOTÓN PARA CARGAR CSV
-# ----------------------------
-archivo = st.file_uploader("📤 Cargar CSV", type=["csv"])
+archivo = st.file_uploader("📤 Cargar archivo Excel", type=["xlsx", "xls"])
 
-if archivo is not None:
-    if st.button("Procesar CSV"):
-        df = pd.read_csv(archivo)
+if archivo:
+    if st.button("Procesar Archivo"):
+        # Leer Excel
+        df = pd.read_excel(archivo, header=None)
 
-        # Validar columnas
-        if not {"correo", "PIN"}.issubset(df.columns):
-            st.error("❌ El archivo debe tener las columnas: correo, PIN")
-        else:
-            st.success("✅ Archivo cargado y procesado correctamente")
+        # Columna A = correo
+        correo = df.iloc[:, 0]
 
-            # Crear formato final
-            df_final = pd.DataFrame()
-            df_final["correo"] = df["correo"]
-            df_final["usuario"] = df["correo"]
-            df_final["col1"] = ""
-            df_final["col2"] = ""
-            df_final["PIN"] = df["PIN"]
+        # Columna F = PIN
+        pin = df.iloc[:, 5]
 
-            st.write("### 📄 Vista previa del CSV final:")
-            st.dataframe(df_final)
+        # Crear formato final CSV
+        df_final = pd.DataFrame({
+            "correo": correo,
+            "usuario": correo,
+            "vacio1": "",
+            "vacio2": "",
+            "PIN": pin
+        })
 
-            # Convertir a CSV
-            csv_bytes = df_final.to_csv(index=False).encode("utf-8")
+        st.write("### 📄 Vista previa del resultado:")
+        st.dataframe(df_final)
 
-            # ----------------------------
-            # 2) BOTÓN PARA DESCARGAR CSV
-            # ----------------------------
-            st.download_button(
-                label="📥 Descargar CSV Formateado",
-                data=csv_bytes,
-                file_name="usuarios_formateado.csv",
-                mime="text/csv"
-            )
+        # Convertir a CSV
+        csv_bytes = df_final.to_csv(index=False, header=False).encode("utf-8")
+
+        # Descargar
+        st.download_button(
+            "📥 Descargar CSV Final",
+            data=csv_bytes,
+            file_name="formato_caasa.csv",
+            mime="text/csv"
+        )
